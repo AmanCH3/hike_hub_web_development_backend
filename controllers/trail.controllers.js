@@ -48,11 +48,34 @@ exports.createTrails = async(req ,res) => {
 
 exports.getAll = async (req, res) => {
     try{
-        const trail = await Trail.find() ;
+        const {page = 1 ,limit = 10, search = ""} = req.query
+        let filter = {}
+        if(search){
+            filter.$or = [
+                {
+                    name : {
+                        $regex : search , $option : "i"
+                    }
+                }
+            ]
+        }
+        const skip = (page - 1) * limit ;
+
+        const trail = await Trail.find(filter).populate("_id" , "name")
+        .skip("skip")
+        .limit(Number(limit))
+
+        const total = await Trail.countDocuments(filter)
         return res.status(200).json({
             success : true ,
             message : "Trail data fetched succesfully" ,
-            data : trail
+            data : trail,
+            pagination : {
+                total ,
+                limit : Number(limit),
+                totalPages : Math.ceil(total / limit) //ceil -> rounds number
+
+            }
         })
 
     }
@@ -150,3 +173,39 @@ exports.deleteTrails = async (req, res) => {
         })
     }
 }
+
+exports.getFilterOne = async (req, res) => {
+    try {
+        const { maxDistance, maxElevation, maxDuration, difficulty } = req.query;
+
+        let filter = {};
+
+        if (maxDistance) {
+            filter.distance = { $lte: Number(maxDistance) };
+        }
+
+        if (maxElevation) {
+            filter.elevation = { $lte: Number(maxElevation) };
+        }
+
+        if (maxDuration) {
+            filter['duration.max'] = { $lte: Number(maxDuration) };
+        }
+
+        if (difficulty && difficulty !== 'All') {
+            filter.difficult = difficulty;
+        }
+
+        const trails = await Trail.find(filter);
+
+        res.status(200).json({
+            success: true,
+            data: trails,
+        });
+    } catch (e) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+        });
+    }
+};
