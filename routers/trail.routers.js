@@ -18,4 +18,6 @@ router.get(
     "/:id",
     trailController.getOneTrail
 )
+
+
 module.exports = router
