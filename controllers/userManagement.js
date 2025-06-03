@@ -28,7 +28,7 @@ exports.registerUser = async (req, res) => {
     const newUser = new User({
       name: name,
       email: email,
-      password: password,
+      password: hashedPassword,
       phone: phone,
     });
 
@@ -82,8 +82,13 @@ exports.loginUser = async(req , res) => {
             "_id" : getUser._id ,
             "name" : getUser.name ,
             "email" : getUser.email ,
-            "phone" : getUser.phone
+            "phone" : getUser.phone,
+            "role" : getUser.role
         }
+
+        // const userResponse = {
+          
+        // }
 
         const token = jwt.sign(payLoad , process.env.SECRET , {expiresIn : '7d'})
 
