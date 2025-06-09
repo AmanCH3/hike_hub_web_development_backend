@@ -2,6 +2,7 @@ require("dotenv").config()
 const express = require("express")
 const connectDB = require('./config/db')
 const trailRoutes = require("./routers/trail.routers")
+const userRoutes = require("./routers/user.routers")
 
 
 
@@ -12,10 +13,12 @@ connectDB()
 
 app.use(express.json())
 
-app.use("/api/trail/" ,trailRoutes )
+app.use("/api/trail" ,trailRoutes )
+app.use("/api/auth" , userRoutes)
 
 
-const PORT = process.env.PORT
+// 5050
+const PORT = process.env.PORT 
 
 app.listen(
     PORT ,

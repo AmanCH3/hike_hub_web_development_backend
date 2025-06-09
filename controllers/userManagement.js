@@ -1,7 +1,6 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { findOne } = require("../models/trail.model");
 
 exports.registerUser = async (req, res) => {
   const { name, email, password, phone } = req.body;
@@ -32,13 +31,27 @@ exports.registerUser = async (req, res) => {
       phone: phone,
     });
 
+    const userResponse = {
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      phone: newUser.phone,
+      role: newUser.role, 
+      hikerType: newUser.hikerType, 
+      joinDate: newUser.joinDate,
+    }
+
     await newUser.save();
+
+
     return res.status(201).json({
       success: true,
-      message: "User reigstered",
-      data: newUser,
+      message: "User Registered",
+      data: userResponse,
     });
+
   } catch (e) {
+    console.log(e)
     return res.status(500).json({
       success: false,
       message: "Server Error",
