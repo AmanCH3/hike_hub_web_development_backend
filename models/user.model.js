@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema (
             required : [true , "Please provide your email"],
             unique : true ,
             minlength : 8 ,
-            select : false
+            select : true
         } ,
 
         phone : {
@@ -37,18 +37,18 @@ const UserSchema = new mongoose.Schema (
         ageGroup : {
             type : String ,
             enum :["18-24" ,"24-35" ,"35-44" , "45-54","55-64" ,"65+"] ,
-            required : [true , "Please provide your age group"]
+            
         } ,
 
         emergencyContact : {
             name : {
                 type : String ,
-                required : [true , "Please provide emergency contact name"]
+               
 
             } ,
             phone : {
                 type : String ,
-                required : [true , "Please provide emergency contact phone"] ,
+                
             } ,
         
         } ,
