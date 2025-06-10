@@ -7,7 +7,7 @@ const { authorize } = require("../middlewares/authorization.middleware");
 
 router.post("/register", registerUser);
 
-router.get("/login", loginUser);
+router.post("/login", loginUser);
 
 // router.put(
 //     '/users/:userIdToUpdate/role' ,

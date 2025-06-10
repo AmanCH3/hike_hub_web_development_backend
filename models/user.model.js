@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema (
             required : [true , "Please provide your email"],
             unique : true ,
             minlength : 8 ,
-            select : false
+            select : true
         } ,
 
         phone : {

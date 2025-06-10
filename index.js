@@ -3,13 +3,23 @@ const express = require("express")
 const connectDB = require('./config/db')
 const trailRoutes = require("./routers/trail.routers")
 const userRoutes = require("./routers/user.routers")
+const cors = require('cors')
 
 
 
 const app = express()
 
+  
+let corsOption = {
+        origin : "*" // can provide list of domain
 
+
+
+    }
+    app.use(cors(corsOption))
+    
 connectDB()
+
 
 app.use(express.json())
 
