@@ -131,7 +131,7 @@ exports.updateCheckList = async (req, res) => {
   }
 };
 
-exports.deleteGroup = async (req, res) => {
+exports.deleteCheckList = async (req, res) => {
   try {
     const result = await Checklist.findByIdAndDelete(req.params.id);
     if (!result) {
