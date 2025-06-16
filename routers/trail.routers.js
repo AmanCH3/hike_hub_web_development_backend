@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const trailController = require("../controllers/trail.controllers");
+const trailController = require("../controllers/admin/trail.controllers");
 
 router.post("", trailController.createTrails);
 
