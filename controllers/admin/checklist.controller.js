@@ -38,9 +38,9 @@ exports.createCheckList = async (req, res) => {
   }
 };
 
-exports.getAll = async (req, res) => {
+exports.getAllCheckList = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search = "" } = req.body;
+    const {page = 1, limit = 10, search = "" } = req.query;
 
     let filters = {};
     if (search) {
@@ -53,7 +53,6 @@ exports.getAll = async (req, res) => {
 
     const skips = (page - 1) * limit;
     const checklist = await Checklist.find()
-      .populate("checklist", "name")
       .populate("items", "name")
       .skip(skips)
       .limit(Number(limit));
@@ -68,11 +67,13 @@ exports.getAll = async (req, res) => {
         total,
         page: Number(page),
         limit: Number(limit),
-        totalPages: Math.cerl(total / limit),
+        totalPages: Math.ceil(total / limit),
       },
     });
   } catch (e) {
+    console.log(e)
     return res.status(500).json({
+        
       success: false,
       message: "Server error",
     });

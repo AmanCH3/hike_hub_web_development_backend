@@ -10,7 +10,7 @@ router.post(
 
 router.get(
     "" ,
-    checklistController.getAll
+    checklistController.getAllCheckList
 )
 router.get(
     "/:id" ,
@@ -26,3 +26,5 @@ router.delete(
     "/:id" ,
     checklistController.deleteCheckList
 )
+
+module.exports = router ;
