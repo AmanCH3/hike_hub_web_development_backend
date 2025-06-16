@@ -1,5 +1,5 @@
 const express = require("express");
-const Trail = require("../models/trail.model");
+const Trail = require("../../models/trail.model");
 
 exports.createTrails = async (req, res) => {
   try {
