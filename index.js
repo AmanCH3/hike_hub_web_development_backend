@@ -3,6 +3,7 @@ const express = require("express")
 const connectDB = require('./config/db')
 const trailRoutes = require("./routers/trail.routers")
 const userRoutes = require("./routers/user.routers")
+const groupRoutes = require("./routers/group.routers")
 const cors = require('cors')
 
 
@@ -25,6 +26,7 @@ app.use(express.json())
 
 app.use("/api/trail" ,trailRoutes )
 app.use("/api/auth" , userRoutes)
+app.use('/api/group' , groupRoutes )
 
 
 // 5050
