@@ -110,7 +110,7 @@ exports.getGroupById = async (req,res) => {
                 message : "Group not found"
             })
         }
-        return res.json({
+        return res.status(200).json({
             success : true ,
             data : group ,
             message : "One Group"
@@ -169,7 +169,7 @@ exports.deletegroup = async (req,res) => {
 
         return res.json({
             success : true ,
-            message : "Updated"
+            message : "Deleted"
         })
 
     }

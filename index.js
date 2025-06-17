@@ -2,9 +2,10 @@ require("dotenv").config()
 const express = require("express")
 const connectDB = require('./config/db')
 const trailRoutes = require("./routers/trail.routers")
-const userRoutes = require("./routers/user.routers")
+const authRoutes = require("./routers/auth.routers")
 const groupRoutes = require("./routers/group.routers")
 const checklistRoutes = require("./routers/checklist.routers")
+const userRoutes = require("./routers/admin/user.routes")
 const cors = require('cors')
 
 
@@ -26,9 +27,10 @@ connectDB()
 app.use(express.json())
 
 app.use("/api/trail" ,trailRoutes )
-app.use("/api/auth" , userRoutes)
+app.use("/api/auth" , authRoutes)
 app.use('/api/group' , groupRoutes )
 app.use("/api/checklist" , checklistRoutes)
+app.use("/api/user" ,userRoutes )
 
 
 // 5050
