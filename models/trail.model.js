@@ -4,36 +4,34 @@ const { trim } = require("validator");
 const trailSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "A trail must have a name"],
     trim: true,
     unique: true,
   },
   location: {
     type: Number,
-    required: [true, "A trail must have a location"],
+ 
   },
   distance: {
     type: Number,
-    required: [true, "A trail must have a distance"],
+   
   },
   elevation: {
     type: Number,
-    required: [true, "A trail must have an elevation gain"],
+   
   },
   duration: {
     min: {
       type: Number,
-      required: [true, "A trail must have a minimum duration"],
+    
     },
     max: {
       type: Number,
-      required: [true, "A trail must have an maximum duration"],
+      
     },
   },
 
   difficult: {
     type: String,
-    required: [true, "A trail must have a difficulty level"],
     enum: {
       values: ["Easy", "Moderate", "Difficult"],
       message: "Difficuly must be either : Easy , Moderate or Difficult",
@@ -42,7 +40,7 @@ const trailSchema = new mongoose.Schema({
 
   description: {
     type: String,
-    required: [true, "A trail must have a description"],
+    
   },
   images: [String],
   features: [String], // ['Waterfall' , "lake" , "forest" , 'mountain views']
@@ -58,7 +56,7 @@ const trailSchema = new mongoose.Schema({
         type: Number,
         min: 1,
         max: 5,
-        required: [true, "Rating must be between 1 and 5"],
+       
       },
       review: String,
       createdAt: {

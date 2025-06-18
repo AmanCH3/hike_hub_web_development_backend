@@ -3,6 +3,7 @@ const Trail = require("../../models/trail.model");
 
 exports.createTrails = async (req, res) => {
   try {
+     const imagePaths = req.file ? [req.file.path] : [];
     const {
       name,
       location,
@@ -11,7 +12,6 @@ exports.createTrails = async (req, res) => {
       duration,
       difficult,
       description,
-      images,
       features,
       seasons,
       ratings,
@@ -28,7 +28,7 @@ exports.createTrails = async (req, res) => {
       distance: distance,
       difficult: difficult,
       description: description,
-      images: images,
+      images: imagePaths,
       features: features,
       seasons: seasons,
       ratings: ratings,
@@ -44,6 +44,7 @@ exports.createTrails = async (req, res) => {
       data: trail,
     });
   } catch (e) {
+    console.log(e)
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -143,11 +144,10 @@ exports.updateTrails = async (req, res) => {
   try {
     const trail = await Trail.findByIdAndUpdate(
       req.params.id,
+      req.body, 
       {
-        name: req.body.name,
-      },
-      {
-        new: true,
+        new: true, 
+        runValidators: true, 
       }
     );
 
