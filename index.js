@@ -6,6 +6,7 @@ const authRoutes = require("./routers/auth.routers")
 const groupRoutes = require("./routers/group.routers")
 const checklistRoutes = require("./routers/checklist.routers")
 const userRoutes = require("./routers/admin/user.routes")
+const path = require("path")
 const cors = require('cors')
 
 
@@ -25,6 +26,7 @@ connectDB()
 
 
 app.use(express.json())
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 app.use("/api/trail" ,trailRoutes )
 app.use("/api/auth" , authRoutes)
