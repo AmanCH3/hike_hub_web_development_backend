@@ -7,8 +7,7 @@ const upload = require("../middlewares/fileUpload");
 
 
 router.post("/create",
-    //  upload.('images', 10), 
-    upload.single('images') ,
+    upload.array('images',10) ,
      trailController.createTrails);
 
 router.get("", trailController.getAll);
@@ -16,7 +15,7 @@ router.get("", trailController.getAll);
 router.get("/:id", trailController.getOneTrail);
 
 router.put("/:id" , 
-   
+   upload.array('images',10) ,
     trailController.updateTrails);
 
 router.delete("/:id", trailController.deleteTrails)
