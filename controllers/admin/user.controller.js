@@ -1,5 +1,6 @@
 const express = require("express");
 const User = require("../../models/user.model");
+const userModel = require("../../models/user.model");
 
 exports.updateUserRole = async (req, res) => {
   const { userToUpdate } = req.params;
@@ -13,14 +14,16 @@ exports.updateUserRole = async (req, res) => {
   }
 
   try {
-    const userToUpdate = await User.findById(userToUpdate);
-    if (!userToUpdate) {
+    const user = await User.findById(userToUpdate);
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "User to update not found",
       });
     }
-    await userToUpdate.save();
+    
+    user.role = newRoles ;
+    await user.save() ;
 
     return res.status(200).json({
       success: true,
@@ -33,7 +36,7 @@ exports.updateUserRole = async (req, res) => {
       },
     });
   } catch (e) {
-    console.log("Error updating user role", e);
+   
     return res.status(500).json({
       success: false,
       message: "Server issue",

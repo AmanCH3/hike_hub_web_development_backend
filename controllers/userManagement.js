@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("Hashed password", hashedPassword);
+    
     const newUser = new User({
       name: name,
       email: email,
@@ -50,7 +50,7 @@ exports.registerUser = async (req, res) => {
       data: userResponse,
     });
   } catch (e) {
-    console.log(e);
+  
     return res.status(500).json({
       success: false,
       message: "Server Error",
@@ -78,8 +78,7 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    console.log("Plain Password:", password);
-    console.log("Hashed Password from DB:", getUser.password);
+    
 
     if (!getUser.password) {
       return res.status(500).json({

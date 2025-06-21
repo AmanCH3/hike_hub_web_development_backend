@@ -43,19 +43,18 @@ exports.getAllCheckList = async (req, res) => {
     const {page = 1, limit = 10, search = "" } = req.query;
 
     let filters = {};
-    if (search) {
-      filters.$or = [
-        {
-          name: { $regex: search, $option: "i" },
-        },
-      ];
-    }
+if (search) {
+  filters.$or = [
+    {
+      name: { $regex: search, $options: "i" },  // Fixed: $options instead of $option
+    },
+  ];
+}
 
-    const skips = (page - 1) * limit;
-    const checklist = await Checklist.find()
-      .populate("items", "name")
-      .skip(skips)
-      .limit(Number(limit));
+const checklist = await Checklist.find(filters)  // Apply filters
+  .populate("items", "name")
+  .skip(skips)
+  .limit(Number(limit));
 
     const total = await Checklist.countDocuments(filters);
 
@@ -96,11 +95,13 @@ exports.getCheckListById = async (req, res) => {
     });
   } catch (err) {
     return (
-      res.status(500).json *
-      {
-        success: false,
-        message: "Server error",
-      }
+      res.status(500).json(
+
+        {
+          success: false,
+          message: "Server error",
+        }
+      )
     );
   }
 };

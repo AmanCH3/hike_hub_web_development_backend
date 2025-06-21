@@ -1,9 +1,237 @@
-const express = require("express");
+// const express = require("express");
+// const Trail = require("../../models/trail.model");
+
+// exports.createTrails = async (req, res) => {
+//   try {
+//     const filepath = req.file?.path
+//     console.log("Uploaded file:", filepath);
+//      const {
+//       name,
+//       location,
+//       distance,
+//       elevation,
+//       duration,
+//       difficult,
+//       description,
+//       features,
+//       seasons,
+//       ratings,
+//       averageRatings,
+//       numRatings,
+//     } = req.body;
+//     const trail = new Trail({
+//       name: name,
+//       location: location,
+//       distance: distance,
+//       elevation: elevation,
+//       duration: duration,
+//       distance: distance,
+//       difficult: difficult,
+//       description: description,
+//       images: filepath,
+//       features: features,
+//       seasons: seasons,
+//       ratings: ratings,
+//       averageRatings: averageRatings,
+//       numRatings: numRatings,
+//     });
+
+//     await trail.save();
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Trail created successfully",
+//       data: trail,
+//     });
+//   } catch (e) {
+//     console.log(e)
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
+// exports.getAll = async (req, res) => {
+//   try {
+//     const {
+//       page = 1,
+//       limit = 10,
+//       search = "",
+//       maxDistance,
+//       maxElevation,
+//       maxDuration,
+//       difficulty,
+//     } = req.query;
+//     let filter = {};
+//     if (search) {
+//       filter.$or = [
+//         {
+//           name: {
+//             $regex: search,
+//             $option: "i",
+//           },
+//         },
+//       ];
+//     }
+//     if (maxDistance) {
+//       filter.distance = { $lte: Number(maxDistance) };
+//     }
+
+//     if (maxElevation) {
+//       filter.elevation = { $lte: Number(maxElevation) };
+//     }
+
+//     if (maxDuration) {
+//       filter["duration.max"] = { $lte: Number(maxDuration) };
+//     }
+
+//     if (difficulty && difficulty !== "All") {
+//       filter.difficult = difficulty;
+//     }
+
+//     const skip = (page - 1) * limit;
+
+//     const trail = await Trail.find(filter)
+//       .populate("_id", "name")
+//       .skip(skip)
+//       .limit(Number(limit));
+
+//     const total = await Trail.countDocuments(filter);
+//     return res.status(200).json({
+//       success: true,
+//       message: "Trail data fetched succesfully",
+//       data: trail,
+//       pagination: {
+//         total,
+//         limit: Number(limit),
+//         totalPages: Math.ceil(total / limit), //ceil -> rounds number
+//       },
+//     });
+//   } catch (e) {
+//     console.log(e)
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
+// exports.getOneTrail = async (req, res) => {
+//   try {
+//     const trail = await Trail.findById(req.params.id);
+//     if (!trail) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Trails not found",
+//       });
+//     }
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Trails fetched succesfully",
+//       data: trail,
+//     });
+//   } catch (e) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
+// exports.updateTrails = async (req, res) => {
+//   try {
+//     const trail = await Trail.findByIdAndUpdate(
+//       req.params.id,
+//       req.body, 
+//       {
+//         new: true, 
+//         runValidators: true, 
+//       }
+//     );
+
+//     if (!trail) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Trail not found",
+//       });
+//     }
+//   } catch (e) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
+// exports.deleteTrails = async (req, res) => {
+//   try {
+//     const trail = await Trail.findByIdAndDelete(req.params.id);
+
+//     if (!trail) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Trails not found",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Trail deleted successfully",
+//     });
+//   } catch (e) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Deleted Trail",
+//     });
+//   }
+// };
+
+// exports.getFilterOne = async (req, res) => {
+//   try {
+//     const { maxDistance, maxElevation, maxDuration, difficulty } = req.query;
+
+//     let filter = {};
+
+//     if (maxDistance) {
+//       filter.distance = { $lte: Number(maxDistance) };
+//     }
+
+//     if (maxElevation) {
+//       filter.elevation = { $lte: Number(maxElevation) };
+//     }
+
+//     if (maxDuration) {
+//       filter["duration.max"] = { $lte: Number(maxDuration) };
+//     }
+
+//     if (difficulty && difficulty !== "All") {
+//       filter.difficult = difficulty;
+//     }
+
+//     const trails = await Trail.find(filter);
+
+//     res.status(200).json({
+//       success: true,
+//       data: trails,
+//     });
+//   } catch (e) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// };
+
+
 const Trail = require("../../models/trail.model");
 
 exports.createTrails = async (req, res) => {
   try {
-     const imagePaths = req.file ? [req.file.path] : [];
+    // Handle multiple files
+    const filepaths = req.files ? req.files.map(file => file.path) : [];
+
     const {
       name,
       location,
@@ -20,20 +248,19 @@ exports.createTrails = async (req, res) => {
     } = req.body;
 
     const trail = new Trail({
-      name: name,
-      location: location,
-      distance: distance,
-      elevation: elevation,
-      duration: duration,
-      distance: distance,
-      difficult: difficult,
-      description: description,
-      images: imagePaths,
-      features: features,
-      seasons: seasons,
-      ratings: ratings,
-      averageRatings: averageRatings,
-      numRatings: numRatings,
+      name,
+      location,
+      distance,
+      elevation,
+      duration,
+      difficult,
+      description,
+      images: filepaths, // Store array of image paths
+      features,
+      seasons,
+      ratings,
+      averageRatings,
+      numRatings,
     });
 
     await trail.save();
@@ -44,7 +271,7 @@ exports.createTrails = async (req, res) => {
       data: trail,
     });
   } catch (e) {
-    console.log(e)
+    console.error(e);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -63,17 +290,13 @@ exports.getAll = async (req, res) => {
       maxDuration,
       difficulty,
     } = req.query;
-    let filter = {};
+
+    const filter = {};
+
     if (search) {
-      filter.$or = [
-        {
-          name: {
-            $regex: search,
-            $option: "i",
-          },
-        },
-      ];
+      filter.name = { $regex: search, $options: "i" };
     }
+
     if (maxDistance) {
       filter.distance = { $lte: Number(maxDistance) };
     }
@@ -91,25 +314,21 @@ exports.getAll = async (req, res) => {
     }
 
     const skip = (page - 1) * limit;
-
-    const trail = await Trail.find(filter)
-      .populate("_id", "name")
-      .skip(skip)
-      .limit(Number(limit));
-
+    const trails = await Trail.find(filter).skip(skip).limit(Number(limit));
     const total = await Trail.countDocuments(filter);
+
     return res.status(200).json({
       success: true,
-      message: "Trail data fetched succesfully",
-      data: trail,
+      message: "Trail data fetched successfully",
+      data: trails,
       pagination: {
         total,
         limit: Number(limit),
-        totalPages: Math.ceil(total / limit), //ceil -> rounds number
+        totalPages: Math.ceil(total / limit),
       },
     });
   } catch (e) {
-    console.log(e)
+    console.error(e);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -123,16 +342,17 @@ exports.getOneTrail = async (req, res) => {
     if (!trail) {
       return res.status(404).json({
         success: false,
-        message: "Trails not found",
+        message: "Trail not found",
       });
     }
 
-    return res.status(201).json({
+    return res.status(200).json({
       success: true,
-      message: "Trails fetched succesfully",
+      message: "Trail fetched successfully",
       data: trail,
     });
   } catch (e) {
+    console.error(e);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -142,14 +362,17 @@ exports.getOneTrail = async (req, res) => {
 
 exports.updateTrails = async (req, res) => {
   try {
-    const trail = await Trail.findByIdAndUpdate(
-      req.params.id,
-      req.body, 
-      {
-        new: true, 
-        runValidators: true, 
-      }
-    );
+    const updatedData = { ...req.body };
+    
+    // Handle multiple files for update
+    if (req.files && req.files.length > 0) {
+      updatedData.images = req.files.map(file => file.path);
+    }
+
+    const trail = await Trail.findByIdAndUpdate(req.params.id, updatedData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!trail) {
       return res.status(404).json({
@@ -157,7 +380,14 @@ exports.updateTrails = async (req, res) => {
         message: "Trail not found",
       });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: "Trail updated successfully",
+      data: trail,
+    });
   } catch (e) {
+    console.error(e);
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -172,7 +402,7 @@ exports.deleteTrails = async (req, res) => {
     if (!trail) {
       return res.status(404).json({
         success: false,
-        message: "Trails not found",
+        message: "Trail not found",
       });
     }
 
@@ -181,9 +411,10 @@ exports.deleteTrails = async (req, res) => {
       message: "Trail deleted successfully",
     });
   } catch (e) {
+    console.error(e);
     return res.status(500).json({
       success: false,
-      message: "Deleted Trail",
+      message: "Server error",
     });
   }
 };
@@ -191,32 +422,21 @@ exports.deleteTrails = async (req, res) => {
 exports.getFilterOne = async (req, res) => {
   try {
     const { maxDistance, maxElevation, maxDuration, difficulty } = req.query;
+    const filter = {};
 
-    let filter = {};
-
-    if (maxDistance) {
-      filter.distance = { $lte: Number(maxDistance) };
-    }
-
-    if (maxElevation) {
-      filter.elevation = { $lte: Number(maxElevation) };
-    }
-
-    if (maxDuration) {
-      filter["duration.max"] = { $lte: Number(maxDuration) };
-    }
-
-    if (difficulty && difficulty !== "All") {
-      filter.difficult = difficulty;
-    }
+    if (maxDistance) filter.distance = { $lte: Number(maxDistance) };
+    if (maxElevation) filter.elevation = { $lte: Number(maxElevation) };
+    if (maxDuration) filter["duration.max"] = { $lte: Number(maxDuration) };
+    if (difficulty && difficulty !== "All") filter.difficult = difficulty;
 
     const trails = await Trail.find(filter);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: trails,
     });
   } catch (e) {
+    console.error(e);
     return res.status(500).json({
       success: false,
       message: "Server error",
