@@ -50,7 +50,7 @@ exports.createGroups = async (req, res) => {
   }
 };
 
-exports.getAll = async (req, res) => {
+exports.getAllGroups = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
 
@@ -162,3 +162,58 @@ exports.deletegroup = async (req, res) => {
     });
   }
 };
+
+
+exports.joinGroup = async (req,res) => {
+  try {
+    const group = await Group.findById(req.params.id)
+
+    if(!group){
+      return res.status(404).json({
+        success : false ,
+        message : "Group not found"
+      }) ;
+    }
+
+    //checking is the group is already full
+
+    if(group.participants.length >= group.maxSize){
+      return res.status(400).json({
+        success : false ,
+        message : "Group is already full"
+      })
+    }
+
+    // check is user is already in the group
+    const isParticipant = group.participants.some(
+      p => p.user.equals(req.user._id)
+    ) ;
+    if(isParticipant){
+      return res.status(400).json({
+        success : false ,
+        message : "You are already a participant in this group"
+      }) ;
+    }
+    
+    group.participants.push({
+      user : req.user._id ,
+      status : "confirmed"
+    }) ;
+    await group.save()
+    return res.status(200).json({
+      success : true ,
+      message : "Successfully joined the group" ,
+      data : group
+    })
+
+
+
+
+  }
+  catch(e){
+    return res.status(500).json({
+      success : false ,
+      message :  "Server error"
+    })
+  }
+}
