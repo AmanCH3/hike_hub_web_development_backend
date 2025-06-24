@@ -3,7 +3,9 @@ const express = require("express");
 const Group = require("../../models/group.model");
 
 exports.createGroups = async (req, res) => {
+  
   try {
+    const filepaths = req.files ? req.files.map(file => file.path) : [];
     const {
       title,
       trail,
@@ -16,7 +18,6 @@ exports.createGroups = async (req, res) => {
       meetingPoint,
       requirement,
       difficulty,
-      photos,
       comments,
     } = req.body;
 
@@ -32,7 +33,7 @@ exports.createGroups = async (req, res) => {
       meetingPoint,
       requirement,
       difficulty,
-      photos,
+      photos : filepaths,
       comments,
     });
 
@@ -65,9 +66,10 @@ exports.getAll = async (req, res) => {
     }
     const skips = (page - 1) * limit;
 
-    const groups = await Group.find()
-      .populate("trail", "name location distance elevation duration difficult")
+    const groups = await Group.find(filters)
+      .populate("trail", "name location distance elevation duration difficult leader participants")
       .populate("participants.user", "name email") 
+      .populate("leader", "name profileImage")
       .skip(skips)
       .limit(Number(limit));
 
@@ -96,10 +98,13 @@ exports.getGroupById = async (req, res) => {
   try {
     const group = await Group.findById(req.params.id)
       .populate("leader", "name email") 
-      .populate("participants.user", "name email")
-      .populate("trail", "name");
+      .populate({
+        path: 'participants.user',
+        select: 'name profileImage hikerType'
+      })
+      .populate("trail");
 
-    console.log(group)
+
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -173,7 +178,7 @@ exports.requestToJoinGroup = async (req, res) => {
   try {
     const groupId = req.params.id;
     const userId = req.user._id; // Assuming user ID is available from protect middleware
-    const { message } = req.body; // Optional message from the user
+    // const { message } = req.body; // Optional message from the user
 
     const group = await Group.findById(groupId);
 
@@ -200,7 +205,7 @@ exports.requestToJoinGroup = async (req, res) => {
     group.participants.push({
       user: userId,
       status: "pending",
-      message: message, // Save the message if provided
+      // message: message, // Save the message if provided
     });
 
     await group.save();
@@ -222,6 +227,7 @@ exports.requestToJoinGroup = async (req, res) => {
 exports.approveJoinRequest = async (req, res) => {
   try {
     const { groupId, requestId } = req.params;
+  
 
     const group = await Group.findById(groupId);
 
@@ -233,6 +239,8 @@ exports.approveJoinRequest = async (req, res) => {
     }
 
     const participant = group.participants.id(requestId); // Mongoose provides .id() for subdocuments
+    console.log(participant)
+   
 
     if (!participant) {
       return res.status(404).json({

@@ -11,7 +11,6 @@ const groupSchema = mongoose.Schema({
         type : mongoose.Schema.ObjectId ,
         ref : "Trail" ,
         required : [true , "A group must be associated with a trail"],
-
     } ,
     date : {
         type : Date ,
