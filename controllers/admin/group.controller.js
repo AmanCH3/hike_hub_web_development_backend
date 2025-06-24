@@ -1,3 +1,4 @@
+// controllers/admin/group.controller.js
 const express = require("express");
 const Group = require("../../models/group.model");
 
@@ -50,7 +51,7 @@ exports.createGroups = async (req, res) => {
   }
 };
 
-exports.getAllGroups = async (req, res) => {
+exports.getAll = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "" } = req.query;
 
@@ -65,8 +66,8 @@ exports.getAllGroups = async (req, res) => {
     const skips = (page - 1) * limit;
 
     const groups = await Group.find()
-      .populate("trail", "name")
-      .populate("participants", "user")
+      .populate("trail", "name location distance elevation duration difficult")
+      .populate("participants.user", "name email") 
       .skip(skips)
       .limit(Number(limit));
 
@@ -93,7 +94,12 @@ exports.getAllGroups = async (req, res) => {
 
 exports.getGroupById = async (req, res) => {
   try {
-    const group = await Group.findById(req.params.id);
+    const group = await Group.findById(req.params.id)
+      .populate("leader", "name email") 
+      .populate("participants.user", "name email")
+      .populate("trail", "name");
+
+    console.log(group)
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -118,8 +124,8 @@ exports.updateGroup = async (req, res) => {
   try {
     const group = await Group.findByIdAndUpdate(
       req.params.id,
-      { name: req.body.name },
-      { new: true }
+      req.body, // Use req.body directly for update
+      { new: true, runValidators: true } // Return the updated document and run schema validators
     );
 
     if (!group) {
@@ -163,57 +169,144 @@ exports.deletegroup = async (req, res) => {
   }
 };
 
-
-exports.joinGroup = async (req,res) => {
+exports.requestToJoinGroup = async (req, res) => {
   try {
-    const group = await Group.findById(req.params.id)
+    const groupId = req.params.id;
+    const userId = req.user._id; // Assuming user ID is available from protect middleware
+    const { message } = req.body; // Optional message from the user
 
-    if(!group){
+    const group = await Group.findById(groupId);
+
+    if (!group) {
       return res.status(404).json({
-        success : false ,
-        message : "Group not found"
-      }) ;
+        success: false,
+        message: "Group not found",
+      });
     }
 
-    //checking is the group is already full
+    // Check if the user is already a participant (pending, confirmed, or declined)
+    const existingParticipant = group.participants.find(
+      (p) => p.user.toString() === userId.toString()
+    );
 
-    if(group.participants.length >= group.maxSize){
+    if (existingParticipant) {
       return res.status(400).json({
-        success : false ,
-        message : "Group is already full"
-      })
+        success: false,
+        message: "You have already requested to join or are already a member of this group.",
+      });
     }
 
-    // check is user is already in the group
-    const isParticipant = group.participants.some(
-      p => p.user.equals(req.user._id)
-    ) ;
-    if(isParticipant){
-      return res.status(400).json({
-        success : false ,
-        message : "You are already a participant in this group"
-      }) ;
-    }
-    
+    // Add the user to participants with a 'pending' status
     group.participants.push({
-      user : req.user._id ,
-      status : "confirmed"
-    }) ;
-    await group.save()
+      user: userId,
+      status: "pending",
+      message: message, // Save the message if provided
+    });
+
+    await group.save();
+
     return res.status(200).json({
-      success : true ,
-      message : "Successfully joined the group" ,
-      data : group
-    })
-
-
-
-
-  }
-  catch(e){
+      success: true,
+      message: "Join request submitted successfully. Waiting for approval.",
+      data: group,
+    });
+  } catch (e) {
+    console.error(e);
     return res.status(500).json({
-      success : false ,
-      message :  "Server error"
-    })
+      success: false,
+      message: "Server error during join request.",
+    });
   }
-}
+};
+
+exports.approveJoinRequest = async (req, res) => {
+  try {
+    const { groupId, requestId } = req.params;
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: "Group not found",
+      });
+    }
+
+    const participant = group.participants.id(requestId); // Mongoose provides .id() for subdocuments
+
+    if (!participant) {
+      return res.status(404).json({
+        success: false,
+        message: "Join request not found",
+      });
+    }
+
+    if (participant.status === "confirmed") {
+      return res.status(400).json({
+        success: false,
+        message: "This request has already been approved.",
+      });
+    }
+
+    participant.status = "confirmed";
+    await group.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Join request approved successfully.",
+      data: group,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      success: false,
+      message: "Server error during approval.",
+    });
+  }
+};
+
+exports.denyJoinRequest = async (req, res) => {
+  try {
+    const { groupId, requestId } = req.params;
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: "Group not found",
+      });
+    }
+
+    const participant = group.participants.id(requestId);
+
+    if (!participant) {
+      return res.status(404).json({
+        success: false,
+        message: "Join request not found",
+      });
+    }
+
+    if (participant.status === "declined") {
+      return res.status(400).json({
+        success: false,
+        message: "This request has already been denied.",
+      });
+    }
+
+    participant.status = "declined"; // Or use group.participants.pull(requestId) to remove the request entirely
+    await group.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Join request denied successfully.",
+      data: group,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      success: false,
+      message: "Server error during denial.",
+    });
+  }
+};
