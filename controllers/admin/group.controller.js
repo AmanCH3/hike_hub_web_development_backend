@@ -178,7 +178,7 @@ exports.requestToJoinGroup = async (req, res) => {
   try {
     const groupId = req.params.id;
     const userId = req.user._id; // Assuming user ID is available from protect middleware
-    // const { message } = req.body; // Optional message from the user
+    const { message } = req.body; // Optional message from the user
 
     const group = await Group.findById(groupId);
 
@@ -205,15 +205,16 @@ exports.requestToJoinGroup = async (req, res) => {
     group.participants.push({
       user: userId,
       status: "pending",
-      // message: message, // Save the message if provided
+      message: message, // Save the message if provided
     });
 
     await group.save();
+    const newParticipantRequest = group.participants[group.participants.length - 1];
 
     return res.status(200).json({
       success: true,
       message: "Join request submitted successfully. Waiting for approval.",
-      data: group,
+      data: { groupId: group._id, requestId: newParticipantRequest._id },
     });
   } catch (e) {
     console.error(e);
@@ -238,7 +239,7 @@ exports.approveJoinRequest = async (req, res) => {
       });
     }
 
-    const participant = group.participants.id(requestId); // Mongoose provides .id() for subdocuments
+    const participant = group.participants.id(requestId); 
     console.log(participant)
    
 
@@ -315,6 +316,81 @@ exports.denyJoinRequest = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Server error during denial.",
+    });
+  }
+};
+
+exports.getAllPendingRequests = async (req, res) => {
+  try {
+    // This aggregation pipeline is the most efficient way to get all pending requests
+    const pendingRequests = await Group.aggregate([
+      // Stage 1: Deconstruct the participants array into a stream of documents
+      { $unwind: "$participants" },
+
+      // Stage 2: Filter these documents to only keep those with 'pending' status
+      { $match: { "participants.status": "pending" } },
+      
+      // Stage 3: Perform a lookup (like a join) to get the user's details
+      {
+        $lookup: {
+          from: "users", // The name of the users collection
+          localField: "participants.user",
+          foreignField: "_id",
+          as: "userDetails"
+        }
+      },
+
+      // Stage 4: Perform a lookup to get the trail's details
+      {
+        $lookup: {
+          from: "trails", // The name of the trails collection
+          localField: "trail",
+          foreignField: "_id",
+          as: "trailDetails"
+        }
+      },
+      
+      // Stage 5: Deconstruct the userDetails array (lookup returns an array)
+      { $unwind: "$userDetails" },
+      
+      // Stage 6: Deconstruct the trailDetails array (optional but good practice)
+      { $unwind: { path: "$trailDetails", preserveNullAndEmptyArrays: true } },
+
+      // Stage 7: Project (reshape) the final output to match what the frontend needs
+      {
+        $project: {
+          _id: "$participants._id", // The unique ID of the join request itself
+          message: "$participants.message",
+          user: { // User information
+            _id: "$userDetails._id",
+            name: "$userDetails.name",
+            profileImage: "$userDetails.profileImage"
+          },
+          group: { // Group information
+            _id: "$_id",
+            title: "$title",
+            date: "$date",
+            trail: {
+              _id: "$trailDetails._id",
+              name: "$trailDetails.name",
+              difficult: "$trailDetails.difficult"
+            }
+          }
+        }
+      }
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Fetched all pending join requests.",
+      data: pendingRequests,
+    });
+
+  } catch (e) {
+    console.error("Error fetching pending requests:", e);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching pending requests.",
     });
   }
 };
