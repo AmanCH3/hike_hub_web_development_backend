@@ -5,7 +5,6 @@ const { protect, admin } = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/fileUpload");
 
 
-
 router.post("/create",
     protect ,
     admin,
@@ -13,8 +12,6 @@ router.post("/create",
      trailController.createTrails);
 
 router.get("",
-    protect ,
-    admin ,
      trailController.getAll);
 
 router.get("/:id",
