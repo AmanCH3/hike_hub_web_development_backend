@@ -18,11 +18,10 @@ const groupSchema = mongoose.Schema({
     } ,
     description : {
         type : String ,
-        required : [true , "A group must have a description"]
+        
     },
     maxSize : {
         type : Number ,
-        required : [true , "A group must have a maximum size"],
         min : [2 , "A group must have at least 2 participants"] ,
         max : [20 , "A group cannot have more than 20 participants"],
     } ,
@@ -58,11 +57,14 @@ const groupSchema = mongoose.Schema({
         description : String ,
 
     },
-    requirements : [String] ,
+    requirements :{
+
+      type :  [String] ,
+        default :[] ,
+    } ,
+
     difficulty : {
         type : String ,
-        enum : ["Easy" ,"Moderate" ,"Difficult"],
-        required : [true , "A group must have a difficulty level"],
     },
     createdAt : {
         type : Date ,
@@ -72,7 +74,11 @@ const groupSchema = mongoose.Schema({
         type : Date ,
         default : Date.now ,
     },
-    photos : [String] ,
+    photos : {
+
+      type :  [String] ,
+        default :[] ,
+    } ,
     comments : [
         {
             user : {
@@ -81,7 +87,6 @@ const groupSchema = mongoose.Schema({
             } ,
             text : {
                 type : String ,
-                required : [true , "A comment must have text"]
             } ,
             createAt : {
                 type : Date ,

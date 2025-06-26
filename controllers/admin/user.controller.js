@@ -27,12 +27,12 @@ exports.updateUserRole = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `User ${userToUpdate.name}'s role to updated to ${newRoles}.`,
+      message: `User ${user.name}'s role to updated to ${newRoles}.`,
       data: {
-        _id: userToUpdate._id,
-        name: userToUpdate.name,
-        email: userToUpdate.email,
-        role: userToUpdate.role,
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (e) {
@@ -219,4 +219,99 @@ exports.deleteUser = async (req, res) => {
       message: "Deleted",
     });
   } catch (e) {}
+};
+
+
+exports.updateUserByAdmin = async(req, res) => {
+  try {
+    const {name , email , phone, hikerType , ageGroup , bio , isActive} = req.body
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id ,
+      {name, email , phone , hikerType , ageGroup , bio, isActive} ,
+      {new : true , runValidators : true}
+
+    ) ;
+    if(!user)
+{
+  return res.status(404).json({message : "User not found"})
+}
+
+return res.status(200).json({
+  success : true ,
+  data : user ,
+  message : "User Updated by admin"
+
+})
+  }
+  catch(e){
+    console.log(e)
+     return res.status(500).json({ success: false, message: "Server error" });
+
+  }
+}
+
+
+exports.getMyProfile  = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+    .populate('completedTrails.trail') ;
+    
+    if(!user){
+      return res.status(404).json({
+        success : false ,
+        message : "User not found"
+      })
+    }
+
+    return res.status(200).json({
+      success : true ,
+      data : user
+    }) ;
+
+
+  }
+  catch(e){
+    return res.status(500).json({
+      success : false ,
+      message : "server error"
+    })
+
+  }
+}
+
+exports.updateMyProfile = async (req, res) => {
+  try {
+
+    const {name, phone, hikerType, ageGroup, emergencyContact, bio, profileImage } = req.body;
+   
+
+    const fieldsToUpdate = {
+        name, phone, hikerType, ageGroup, emergencyContact, bio, profileImage
+    };
+    
+    const user = await User.findByIdAndUpdate(
+        req.user.id, 
+        { $set: fieldsToUpdate },
+        { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: user,
+      message: "Your profile has been updated.",
+    });
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.deactivateMyAccount = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { isActive: false });
+    return res.status(200).json({ success: true, message: "Your account has been deactivated." });
+  } catch (e) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
 };
