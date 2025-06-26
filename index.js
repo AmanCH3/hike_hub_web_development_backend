@@ -21,15 +21,13 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "*", 
+    methods : ["GET" , "POST"]
   },
 });
 
   
 let corsOption = {
         origin : "*"
-
-
-
     }
     app.use(cors(corsOption))
     
@@ -51,7 +49,7 @@ io.on("connection" , (socket) => {
 
     socket.on("joinGroup" , (groupId) => {
         socket.join(groupId) ;
-        console.log(`User ${socket.id} joined group ${groupId}`) ;
+        console.log(`User ${socket.id} joined group room ${groupId}`) ;
 
     }) ;
      socket.on("leaveGroup", (groupId) => {
@@ -60,18 +58,20 @@ io.on("connection" , (socket) => {
   });
   socket.on("sendMessage", async ({ groupId, senderId, text }) => {
     try {
-      const message = new Message({
+      const newMessage = new Message({
         group: groupId,
         sender: senderId,
         text: text,
       });
-      await message.save();
-      
-      await message.populate('sender', 'name profileImage');
+       let savedMessage = await newMessage.save();
 
-      io.to(groupId).emit("newMessage", message);
+      
+      savedMessage =  await Message.populate('sender', 'name profileImage');
+
+      io.to(groupId).emit("newMessage", savedMessage);
     } catch (error) {
       console.error("Error saving message:", error);
+       socket.emit('messageError', { message: 'Could not send message.' });
     }
   });
   socket.on("disconnect", () => {

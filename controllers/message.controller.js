@@ -1,8 +1,8 @@
-const Messsage = require("../models/message.model")
+const Message = require("../models/message.model")
     
 exports.getMessageForGroup =  async (req , res) => {
     try {
-        const messages = await Messsage.find({ group: req.params.groupId })
+        const messages = await Message.find({ group: req.params.groupId })
       .populate("sender", "name profileImage")
       .sort({ createdAt: "asc" });
       return res.status(200).json({
@@ -16,7 +16,7 @@ exports.getMessageForGroup =  async (req , res) => {
 
         return res.status(500).json({
             success : false ,
-             message : "server error"
+             message : "Server error while fetching messages."
         })
     }
 }

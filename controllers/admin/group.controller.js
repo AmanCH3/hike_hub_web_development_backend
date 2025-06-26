@@ -16,7 +16,7 @@ exports.createGroups = async (req, res) => {
       participants,
       status,
       meetingPoint,
-      requirement,
+      requirements,
       difficulty,
       comments,
     } = req.body;
@@ -26,12 +26,12 @@ exports.createGroups = async (req, res) => {
       trail,
       date,
       description,
-      maxSize,
+     maxSize: parseInt(maxSize, 10),
       leader,
       participants,
       status,
       meetingPoint,
-      requirement,
+      requirements : requirements || [],
       difficulty,
       photos : filepaths,
       comments,
@@ -45,6 +45,7 @@ exports.createGroups = async (req, res) => {
       data: group,
     });
   } catch (e) {
+    console.log(e)
     return res.status(500).json({
       success: false,
       message: "Server error",

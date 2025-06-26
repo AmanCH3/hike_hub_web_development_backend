@@ -7,9 +7,28 @@ const { protect, admin } = require("../../middlewares/auth.middleware");
 router.post(
   "/create",
   protect ,
-  admin ,
   userController.createUser
 );
+
+router.get(
+   "/me" ,
+   protect ,
+   userController.getMyProfile
+)
+
+router.put(
+   "/me" ,
+   protect ,
+   userController.updateMyProfile
+)
+
+router.delete(
+   "/me" ,
+   protect ,
+   userController.deactivateMyAccount
+)
+
+// ===========admin only ==========
 
 router.get("/",
    protect ,
@@ -23,12 +42,17 @@ router.get("/:id",
 
 router.put(
      "/:id",
-  protect ,
-   admin,
-   userController.updateUser);
+     protect ,
+     admin,
+   userController.updateUserByAdmin);
 
 router.delete("/:id",
-   (protect, admin), 
+   protect ,
+   admin,
+    
    userController.deleteUser);
 
+router.put("/role/:userToUpdateId" , admin , userController.updateUserRole)
+
 module.exports = router;
+   
