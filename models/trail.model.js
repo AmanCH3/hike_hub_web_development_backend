@@ -8,7 +8,7 @@ const trailSchema = new mongoose.Schema({
     unique: true,
   },
   location: {
-    type: Number,
+    type: String,
  
   },
   distance: {

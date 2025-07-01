@@ -13,6 +13,7 @@ const path = require("path")
 const cors = require('cors')
 const Message = require("./models/message.model");
 const { Socket } = require("dgram");
+const bodyParser = require("body-parser");
 
 
 
@@ -35,6 +36,7 @@ connectDB()
 
 
 app.use(express.json())
+app.use(bodyParser.json())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 app.use("/api/trail" ,trailRoutes )

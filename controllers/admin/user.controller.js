@@ -280,7 +280,9 @@ exports.getMyProfile  = async (req, res) => {
   }
 }
 
-exports.updateMyProfile = async (req, res) => {
+exports.updateMyProfile = async (req, res) => {  
+ 
+  
   try {
 
     const {name, phone, hikerType, ageGroup, emergencyContact, bio, profileImage } = req.body;
