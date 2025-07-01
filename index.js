@@ -9,6 +9,7 @@ const groupRoutes = require("./routers/group.routers")
 const checklistRoutes = require("./routers/checklist.routers")
 const userRoutes = require("./routers/admin/user.routes")
 const messageRoutes = require("./routers/message.routes")
+const chatbotRoutes = require("./routers/chatbot.routes")
 const path = require("path")
 const cors = require('cors')
 const Message = require("./models/message.model");
@@ -45,6 +46,8 @@ app.use('/api/group' , groupRoutes )
 app.use("/api/checklist" , checklistRoutes)
 app.use("/api/user" ,userRoutes )
 app.use("/api/messages" , messageRoutes)
+// ==========chatbot =========
+app.use('/api/v1/chatbot' , chatbotRoutes)
 
 io.on("connection" , (socket) => {
     console.log("a user connected :" , socket.id) ;
