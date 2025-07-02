@@ -63,22 +63,26 @@ io.on("connection" , (socket) => {
   });
   socket.on("sendMessage", async ({ groupId, senderId, text }) => {
     try {
+  
       const newMessage = new Message({
         group: groupId,
         sender: senderId,
         text: text,
       });
-       let savedMessage = await newMessage.save();
+      const savedMessage = await newMessage.save();
 
-      
-      savedMessage =  await Message.populate('sender', 'name profileImage');
 
-      io.to(groupId).emit("newMessage", savedMessage);
+      const populatedMessage = await Message.findById(savedMessage._id)
+          .populate('sender', 'name profileImage'); 
+
+      // 3. Emit the FULLY POPULATED message object to everyone in the group
+      io.to(groupId).emit("newMessage", populatedMessage);
+
     } catch (error) {
-      console.error("Error saving message:", error);
-       socket.emit('messageError', { message: 'Could not send message.' });
+      console.error("Error handling message:", error);
+      socket.emit('messageError', { message: 'Could not send message.' });
     }
-  });
+});
   socket.on("disconnect", () => {
     console.log("user disconnected:", socket.id);
   });
