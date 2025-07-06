@@ -136,3 +136,24 @@ exports.getTransactionHistory = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
+
+exports.getAllTransactionHistory = async (req, res) => {
+    try {
+        const allTransactions = await Payment.find({})
+        .populate('userId' , 'name email')
+        .sort({ createdAt: -1}) ;
+
+        return res.status(200).json({
+            success : true ,
+            data : allTransactions
+        }) ;
+
+    }
+    catch(error) {
+        console.error('Get transaction history error ', error);
+        return res.status(500).json({
+            success : false ,
+            message : "Server error"
+        })
+    }
+}
