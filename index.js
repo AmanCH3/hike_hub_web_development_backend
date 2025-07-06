@@ -15,7 +15,7 @@ const cors = require('cors')
 const Message = require("./models/message.model");
 const { Socket } = require("dgram");
 const bodyParser = require("body-parser");
-
+const paymentRoutes = require('./routers/payment.router')
 
 
 const app = express()
@@ -46,6 +46,7 @@ app.use('/api/group' , groupRoutes )
 app.use("/api/checklist" , checklistRoutes)
 app.use("/api/user" ,userRoutes )
 app.use("/api/messages" , messageRoutes)
+app.use('/api/payment' , paymentRoutes)
 // ==========chatbot =========
 app.use('/api/v1/chatbot' , chatbotRoutes)
 
@@ -75,7 +76,7 @@ io.on("connection" , (socket) => {
       const populatedMessage = await Message.findById(savedMessage._id)
           .populate('sender', 'name profileImage'); 
 
-      // 3. Emit the FULLY POPULATED message object to everyone in the group
+  
       io.to(groupId).emit("newMessage", populatedMessage);
 
     } catch (error) {
