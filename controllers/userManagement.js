@@ -70,7 +70,7 @@ exports.loginUser = async (req, res) => {
 
   try {
     const getUser = await User.findOne({ email: email });
-    console.log(getUser)
+    console.log(`Login user ${getUser}`) ;
     if (!getUser) {
       return res.status(404).json({
         success: false,

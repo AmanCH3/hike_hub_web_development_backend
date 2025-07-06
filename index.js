@@ -9,11 +9,13 @@ const groupRoutes = require("./routers/group.routers")
 const checklistRoutes = require("./routers/checklist.routers")
 const userRoutes = require("./routers/admin/user.routes")
 const messageRoutes = require("./routers/message.routes")
+const chatbotRoutes = require("./routers/chatbot.routes")
 const path = require("path")
 const cors = require('cors')
 const Message = require("./models/message.model");
 const { Socket } = require("dgram");
-
+const bodyParser = require("body-parser");
+const paymentRoutes = require('./routers/payment.router')
 
 
 const app = express()
@@ -35,6 +37,7 @@ connectDB()
 
 
 app.use(express.json())
+app.use(bodyParser.json())
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 app.use("/api/trail" ,trailRoutes )
@@ -43,6 +46,9 @@ app.use('/api/group' , groupRoutes )
 app.use("/api/checklist" , checklistRoutes)
 app.use("/api/user" ,userRoutes )
 app.use("/api/messages" , messageRoutes)
+app.use('/api/payment' , paymentRoutes)
+// ==========chatbot =========
+app.use('/api/v1/chatbot' , chatbotRoutes)
 
 io.on("connection" , (socket) => {
     console.log("a user connected :" , socket.id) ;
@@ -58,22 +64,26 @@ io.on("connection" , (socket) => {
   });
   socket.on("sendMessage", async ({ groupId, senderId, text }) => {
     try {
+  
       const newMessage = new Message({
         group: groupId,
         sender: senderId,
         text: text,
       });
-       let savedMessage = await newMessage.save();
+      const savedMessage = await newMessage.save();
 
-      
-      savedMessage =  await Message.populate('sender', 'name profileImage');
 
-      io.to(groupId).emit("newMessage", savedMessage);
+      const populatedMessage = await Message.findById(savedMessage._id)
+          .populate('sender', 'name profileImage'); 
+
+  
+      io.to(groupId).emit("newMessage", populatedMessage);
+
     } catch (error) {
-      console.error("Error saving message:", error);
-       socket.emit('messageError', { message: 'Could not send message.' });
+      console.error("Error handling message:", error);
+      socket.emit('messageError', { message: 'Could not send message.' });
     }
-  });
+});
   socket.on("disconnect", () => {
     console.log("user disconnected:", socket.id);
   });

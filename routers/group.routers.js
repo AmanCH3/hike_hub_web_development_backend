@@ -7,7 +7,7 @@ const upload = require("../middlewares/fileUpload");
 
 
 router.post('/create',protect,upload.array('photo',10) , groupController.createGroups)
-router.get('' , groupController.getAll) ;
+router.get('/' , groupController.getAll) ;
 router.get('/:id' , groupController.getGroupById) ;
 router.put('/:id' ,protect, admin, groupController.updateGroup) ;
 router.delete('/id',protect, admin , groupController.deletegroup ) ;

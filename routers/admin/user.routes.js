@@ -17,13 +17,13 @@ router.get(
 )
 
 router.put(
-   "/me" ,
+   "/update" ,
    protect ,
    userController.updateMyProfile
 )
 
 router.delete(
-   "/me" ,
+   "/delete" ,
    protect ,
    userController.deactivateMyAccount
 )
@@ -47,9 +47,7 @@ router.put(
    userController.updateUserByAdmin);
 
 router.delete("/:id",
-   protect ,
-   admin,
-    
+   protect ,    
    userController.deleteUser);
 
 router.put("/role/:userToUpdateId" , admin , userController.updateUserRole)
