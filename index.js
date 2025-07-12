@@ -103,3 +103,6 @@ console.log(`Server is running on ${PORT} `)
     }
 
 )   
+
+
+module.exports = app

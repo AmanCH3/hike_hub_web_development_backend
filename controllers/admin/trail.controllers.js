@@ -1,6 +1,4 @@
 
-
-
 const Trail = require("../../models/trail.model");
 
 exports.createTrails = async (req, res) => {
@@ -114,7 +112,8 @@ exports.getAll = async (req, res) => {
 
 exports.getOneTrail = async (req, res) => {
   try {
-    const trail = await Trail.findById(req.params.id);
+    const trail = await Trail.findById(req.params.id)
+                                 .populate('participants', 'name email');  //populate participants  details
     if (!trail) {
       return res.status(404).json({
         success: false,
@@ -211,6 +210,77 @@ exports.getFilterOne = async (req, res) => {
       success: true,
       data: trails,
     });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+exports.joinTrails = async (req, res) => {
+
+  try {
+    const userId = req.user.id ;
+    const {trailId} = req.params  ;
+
+    const updatedTrail = await Trail.findByIdAndUpdate(
+      trailId,
+      { $addToSet: { participants: userId } }, // $addToSet is perfect here
+      { new: true, runValidators: true }    // `new: true` returns the modified doc
+    ).populate('participants', 'name email');
+
+    // Check if the trail existed
+    if (!updatedTrail) {
+      return res.status(404).json({
+        message: "Trail not found",
+        success: false
+      });
+    }
+
+    return res.status(200).json({
+      message : "Join trail successful" ,
+      data : updatedTrail ,
+      success : true 
+    }) ;
+  }
+  catch (e){
+    console.log(e)
+    return res.status(500).json({
+      success : false ,
+      message : "Server error" 
+
+    })
+  }
+}
+
+
+
+exports.leaveTrail = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+     const {trailId} = req.params  ;
+    const trail = await Trail.findById(trailId);
+
+    if (!trail) {
+      return res.status(404).json({
+        success: false,
+        message: "Trail not found",
+      });
+    }
+    const updatedTrail = await Trail.findByIdAndUpdate(
+      trailId,
+      { $pull: { participants: userId } },
+      { new: true }
+    ).populate('participants', 'name email');
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully left the trail",
+      data: updatedTrail,
+    });
+
   } catch (e) {
     console.error(e);
     return res.status(500).json({

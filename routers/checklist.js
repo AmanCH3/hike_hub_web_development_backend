@@ -4,4 +4,4 @@ const { generateChecklist } = require("../controllers/checklist_generator.contro
 
 router.get("/generate", generateChecklist);
 
-module.exports = router;
+module.exports = router;    
