@@ -93,16 +93,16 @@ io.on("connection" , (socket) => {
 })
 
 
-// 5050
-const PORT = process.env.PORT  || 3000
+// // 5050
+// const PORT = process.env.PORT  || 3000
 
-server.listen(
-    PORT ,
-    () => {
-console.log(`Server is running on ${PORT} `)
-    }
+// server.listen(
+//     PORT ,
+//     () => {
+// console.log(`Server is running on ${PORT} `)
+//     }
 
-)   
+// )   
 
 
 module.exports = app

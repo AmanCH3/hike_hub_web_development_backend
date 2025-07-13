@@ -13,7 +13,6 @@ const connectDB = async() => {
         )
         console.log("Mongodb connected")
 
-
     }
     catch (err){
         console.log('Database Error' , err)
