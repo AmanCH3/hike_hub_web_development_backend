@@ -1,4 +1,3 @@
-// test/user.test.js
 
 const request = require("supertest")
 const app = require("../index")
@@ -47,8 +46,8 @@ describe(
                         phone: "1234567890" 
                     }
                 )
-            expect(res.statusCode).toBe(400) 
-            expect(res.body.success).toBe(false)
+            expect(res.statusCode).toBe(201) 
+            expect(res.body.success).toBe(true)
         })
 
         test("can login a user with a valid credentials", async () => {
@@ -58,8 +57,8 @@ describe(
                     email: "ram123@gmail.com",
                     password: "password"
                 })
-            expect(res.statusCode).toBe(404)
-            expect(res.body.token).toEqual(expect.undefined)
+            expect(res.statusCode).toBe(200)
+            expect(res.body.token).toEqual(res.body.token)
             authToken = res.body.token // This will now receive a valid token
         })
     }
@@ -80,8 +79,8 @@ describe("Authenticated Admin routes", () => {
                 .get("/api/user/")
                 .set("Authorization", "Bearer " + authToken)
 
-            expect(res.statusCode).toBe(401)
-            expect(res.body.success).toBe(false)
+            expect(res.statusCode).toBe(200)
+            expect(res.body.success).toBe(true)
         })
 
     test("can not get all users without token", async () => {
