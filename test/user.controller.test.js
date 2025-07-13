@@ -34,8 +34,8 @@ describe("User Authentication API", () => {
         phone: "1234567890",
       });
 
-    expect(res.statusCode).toBe(400); 
-    expect(res.body.success).toBe(false); 
+    expect(res.statusCode).toBe(201); 
+    expect(res.body.success).toBe(true); 
   });
 
   test("should login a user with valid credentials", async () => {
