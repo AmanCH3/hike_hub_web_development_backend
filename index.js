@@ -6,7 +6,7 @@ const connectDB = require('./config/db')
 const trailRoutes = require("./routers/trail.routers")
 const authRoutes = require("./routers/auth.routers")
 const groupRoutes = require("./routers/group.routers")
-const checklistRoutes = require("./routers/checklist.routers")
+// const checklistRoutes = require("./routers/checklist.routers")
 const userRoutes = require("./routers/admin/user.routes")
 const messageRoutes = require("./routers/message.routes")
 const chatbotRoutes = require("./routers/chatbot.routes")
@@ -16,6 +16,7 @@ const Message = require("./models/message.model");
 const { Socket } = require("dgram");
 const bodyParser = require("body-parser");
 const paymentRoutes = require('./routers/payment.router')
+const checklistRoutes = require('./routers/checklist')
 
 
 const app = express()
@@ -47,6 +48,7 @@ app.use("/api/checklist" , checklistRoutes)
 app.use("/api/user" ,userRoutes )
 app.use("/api/messages" , messageRoutes)
 app.use('/api/payment' , paymentRoutes)
+// app.use("/api/checklist",checklistRoutes);
 // ==========chatbot =========
 app.use('/api/v1/chatbot' , chatbotRoutes)
 
@@ -91,13 +93,16 @@ io.on("connection" , (socket) => {
 })
 
 
-// 5050
-const PORT = process.env.PORT  || 3000
+// // 5050
+// const PORT = process.env.PORT  || 3000
 
-server.listen(
-    PORT ,
-    () => {
-console.log(`Server is running on ${PORT} `)
-    }
+// server.listen(
+//     PORT ,
+//     () => {
+// console.log(`Server is running on ${PORT} `)
+//     }
 
-)   
+// )   
+
+
+module.exports = app

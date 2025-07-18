@@ -30,6 +30,11 @@ const trailSchema = new mongoose.Schema({
     },
   },
 
+   participants: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "User" 
+  }],
+
   difficult: {
     type: String,
     enum: {

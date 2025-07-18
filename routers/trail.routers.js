@@ -30,4 +30,6 @@ router.delete("/:id",
     admin,
      trailController.deleteTrails)
 
+router.post("/:trailId/join-trail" , protect , trailController.joinTrails)
+router.post('/:trailId/leaver-trail' , protect , trailController.leaveTrail)
 module.exports = router;
