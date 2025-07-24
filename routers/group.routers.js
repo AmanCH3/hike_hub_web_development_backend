@@ -5,7 +5,6 @@ const { protect, admin } = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/fileUpload");
 
 
-
 router.post('/create',protect,upload.array('photo',10) , groupController.createGroups)
 router.get('/' , groupController.getAll) ;
 router.get('/:id' , groupController.getGroupById) ;
