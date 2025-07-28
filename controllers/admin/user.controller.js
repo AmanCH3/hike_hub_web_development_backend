@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../../models/user.model");
 const userModel = require("../../models/user.model");
+const Group = require('../../models/group.model')
 
 exports.updateUserRole = async (req, res) => {
   const { userToUpdate } = req.params;
@@ -255,7 +256,8 @@ return res.status(200).json({
 exports.getMyProfile  = async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
-    .populate('completedTrails.trail') ;
+    .populate('completedTrails.trail') 
+    .lean();
     
     if(!user){
       return res.status(404).json({
@@ -263,6 +265,21 @@ exports.getMyProfile  = async (req, res) => {
         message : "User not found"
       })
     }
+
+    const userGroups = await Group.find({
+      $or: [
+        { leader: user._id }, 
+        { 'participants.user': user._id } 
+      ]
+    })
+    
+    .populate('leader', 'name profileImage')
+    .populate('participants.user', 'name profileImage')
+    .populate('trail', 'name')
+    .sort({ date: -1 }) 
+    .lean();
+
+    user.groups = userGroups;
 
     return res.status(200).json({
       success : true ,

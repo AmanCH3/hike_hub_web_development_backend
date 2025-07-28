@@ -178,8 +178,8 @@ exports.deletegroup = async (req, res) => {
 exports.requestToJoinGroup = async (req, res) => {
   try {
     const groupId = req.params.id;
-    const userId = req.user._id; // Assuming user ID is available from protect middleware
-    const { message } = req.body; // Optional message from the user
+    const userId = req.user._id; 
+    const { message } = req.body; 
 
     const group = await Group.findById(groupId);
 
@@ -190,7 +190,6 @@ exports.requestToJoinGroup = async (req, res) => {
       });
     }
 
-    // Check if the user is already a participant (pending, confirmed, or declined)
     const existingParticipant = group.participants.find(
       (p) => p.user.toString() === userId.toString()
     );
@@ -202,11 +201,10 @@ exports.requestToJoinGroup = async (req, res) => {
       });
     }
 
-    // Add the user to participants with a 'pending' status
     group.participants.push({
       user: userId,
       status: "pending",
-      message: message, // Save the message if provided
+      message: message, 
     });
 
     await group.save();
@@ -304,7 +302,7 @@ exports.denyJoinRequest = async (req, res) => {
       });
     }
 
-    participant.status = "declined"; // Or use group.participants.pull(requestId) to remove the request entirely
+    participant.status = "declined"; 
     await group.save();
 
     return res.status(200).json({
@@ -323,46 +321,35 @@ exports.denyJoinRequest = async (req, res) => {
 
 exports.getAllPendingRequests = async (req, res) => {
   try {
-    // This aggregation pipeline is the most efficient way to get all pending requests
     const pendingRequests = await Group.aggregate([
-      // Stage 1: Deconstruct the participants array into a stream of documents
       { $unwind: "$participants" },
 
-      // Stage 2: Filter these documents to only keep those with 'pending' status
       { $match: { "participants.status": "pending" } },
       
-      // Stage 3: Perform a lookup (like a join) to get the user's details
       {
         $lookup: {
-          from: "users", // The name of the users collection
+          from: "users", 
           localField: "participants.user",
           foreignField: "_id",
           as: "userDetails"
         }
       },
-
-      // Stage 4: Perform a lookup to get the trail's details
       {
         $lookup: {
-          from: "trails", // The name of the trails collection
+          from: "trails", 
           localField: "trail",
           foreignField: "_id",
           as: "trailDetails"
         }
       },
       
-      // Stage 5: Deconstruct the userDetails array (lookup returns an array)
       { $unwind: "$userDetails" },
-      
-      // Stage 6: Deconstruct the trailDetails array (optional but good practice)
       { $unwind: { path: "$trailDetails", preserveNullAndEmptyArrays: true } },
-
-      // Stage 7: Project (reshape) the final output to match what the frontend needs
       {
         $project: {
-          _id: "$participants._id", // The unique ID of the join request itself
+          _id: "$participants._id", 
           message: "$participants.message",
-          user: { // User information
+          user: { 
             _id: "$userDetails._id",
             name: "$userDetails.name",
             profileImage: "$userDetails.profileImage"

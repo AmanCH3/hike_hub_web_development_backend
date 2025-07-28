@@ -1,4 +1,4 @@
-const crypto = require('crypto-js');
+    const crypto = require('crypto-js');
 const { v4: uuidv4 } = require('uuid');
 const Payment = require('../models/payment.model');
 const User = require('../models/user.model');
