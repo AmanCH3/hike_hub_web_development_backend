@@ -4,7 +4,6 @@ const userController = require("../../controllers/admin/user.controller");
 const { protect, admin } = require("../../middlewares/auth.middleware");
 const upload = require("../../middlewares/fileUpload"); // ✅ ADDED: Import multer config
 
-// --- User-specific routes ---
 router.get(
   "/me",
   protect,
@@ -12,20 +11,20 @@ router.get(
 );
 
 router.put(
-  "/me", // ✅ CHANGED: Was "/update" for consistency
+  "/me", 
   protect,
   userController.updateMyProfile
 );
 
 router.put(
-  "/me/picture", // ✅ ADDED: New route for profile picture
+  "/me/picture", 
   protect,
   upload.single("profileImage"),
   userController.updateMyProfilePicture
 );
 
 router.delete(
-  "/me", // ✅ CHANGED: Was "/delete" for consistency
+  "/me", 
   protect,
   userController.deactivateMyAccount
 );
@@ -35,7 +34,7 @@ router.delete(
 router.post(
   "/create",
   protect,
-  admin, // This should likely be admin-only
+  admin, 
   userController.createUser
 );
 

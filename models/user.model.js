@@ -1,111 +1,3 @@
-// const mongoose = require('mongoose')
-// const validator = require("validator")
-// const bcrypt = require('bcrypt')
-
-// const UserSchema = new mongoose.Schema(
-//     {
-//         name: {
-//             type: String,
-//             required: [true, "Please provide your name"]
-//         },
-//         email: {
-//             type: String,
-//             required: [true, "Please provide your email"],
-//             unique: true,
-//             lowercase: true,
-//             validate: [validator.isEmail, "Please provide a valid email"]
-//         },
-//         password: {
-//             type: String,
-//             required: [true, "Please provide your password"], // Corrected message
-//             minlength: 8,
-//             select: true
-//         },
-//         phone: {
-//             type: String,
-//             required: [true, "Please provide a phone number"] // Corrected message
-//         },
-//         hikerType: {
-//             type: String,
-//             enum: ["new", "experienced"],
-//             default: "new"
-//         },
-//         ageGroup: {
-//             type: String,
-//             enum: ["18-24", "24-35", "35-44", "45-54", "55-64", "65+"],
-//         },
-//         emergencyContact: {
-//             name: { type: String },
-//             phone: { type: String },
-//         },
-//         bio: {
-//             type: String,
-//             default: "",
-//         },
-//         profileImage: {
-//             type: String,
-//             default: ""
-//         },
-//         joinDate: {
-//             type: Date,
-//             default: Date.now
-//         },
-//         role: {
-//             type: String,
-//             enum: ["user", "guide", "admin"],
-//             default: "user"
-//         },
-//         subscription: {
-//             type: String,
-//             enum: ["Basic", "Pro", "Premium"], // Capitalized to match frontend
-//             default: "Basic"
-//         },
-//         subscriptionExpiresAt: { // --- NEW FIELD ---
-//             type: Date,
-//             default: null
-//         },
-//         active: {
-//             type: Boolean,
-//             default: true,
-//             select: false
-//         },
-//         stats: {
-//             totalHikes: { type: Number, default: 0 },
-//             totalDistance: { type: Number, default: 0 },
-//             totalElevation: { type: Number, default: 0 },
-//             totalHours: { type: Number, default: 0 },
-//             hikesJoined: { type: Number, default: 0 },
-//             hikesLed: { type: Number, default: 0 }
-//         },
-//         achievements: [{
-//             type: mongoose.Schema.ObjectId,
-//             ref: "Achievement",
-//         }],
-//         completedTrails: [{
-//             trail: {
-//                 type: mongoose.Schema.ObjectId,
-//                 ref: "Trail" // Corrected ref
-//             },
-//             completedAt: {
-//                 type: Date,
-//                 default: Date.now
-//             }
-//         }],
-//     },
-//     {
-//         timestamps: true,
-//         toJSON: { virtuals: true },
-//         toObject: { virtuals: true },
-//     }
-// );
-
-// module.exports = mongoose.model("User", UserSchema);
-
-
-
-
-
-
 
 const mongoose = require('mongoose')
 const validator = require("validator")
@@ -128,7 +20,7 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: [true, "Please provide your password"],
             minlength: 8,
-            select: false // Changed to false for better security by default
+            select: false 
         },
         phone: {
             type: String,
@@ -200,8 +92,6 @@ const UserSchema = new mongoose.Schema(
                 default: Date.now
             }
         }],
-        // ✅ --- NEW FIELD ADDED ---
-        // This array holds trails the user has scheduled but not yet completed.
         joinedTrails: [{
             trail: {
                 type: mongoose.Schema.ObjectId,
@@ -216,7 +106,12 @@ const UserSchema = new mongoose.Schema(
                 type: Date,
                 default: Date.now
             },
-        }]
+        }] ,
+        isInAGroup: {
+            type: Boolean,
+            default: false, 
+        },
+
     },
     {
         timestamps: true,

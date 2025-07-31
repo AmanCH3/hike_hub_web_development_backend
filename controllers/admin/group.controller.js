@@ -21,16 +21,21 @@ exports.createGroups = async (req, res) => {
       comments,
     } = req.body;
 
+    // Handle meetingPoint properly
+    const meetingPointData = typeof meetingPoint === 'string' 
+      ? { description: meetingPoint }
+      : meetingPoint;
+
     const group = new Group({
       title: title,
       trail,
       date,
       description,
-     maxSize: parseInt(maxSize, 10),
+      maxSize: parseInt(maxSize, 10),
       leader,
       participants,
       status,
-      meetingPoint,
+      meetingPoint: meetingPointData,
       requirements : requirements || [],
       difficulty,
       photos : filepaths,

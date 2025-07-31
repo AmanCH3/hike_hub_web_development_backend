@@ -79,11 +79,13 @@ const groupSchema = mongoose.Schema({
       type :  [String] ,
         default :[] ,
     } ,
+
+    
     comments : [
         {
             user : {
                 type : mongoose.Schema.ObjectId ,
-                red : "User",
+                ref : "User",
             } ,
             text : {
                 type : String ,

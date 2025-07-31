@@ -120,14 +120,12 @@ const trailSchema = new mongoose.Schema({
         min: { type: Number },
         max: { type: Number },
     },
-    // ✅ Corrected typo from "difficult" to "difficulty"
-    difficulty: {
+    difficult: {
         type: String,
         enum: {
             values: ["Easy", "Moderate", "Hard"], // Changed to Hard for consistency
             message: "Difficulty must be either: Easy, Moderate, or Hard",
         },
-        required: [true, "A trail must have a difficulty level."]
     },
     description: {
         type: String,

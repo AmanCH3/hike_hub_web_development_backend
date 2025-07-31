@@ -88,7 +88,7 @@ describe('Trail Controller Tests', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .send(trailData);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
       expect(response.body.data.name).toBe(trailData.name);
     });
@@ -137,7 +137,7 @@ describe('Trail Controller Tests', () => {
         .field('difficult', 'Easy')
         .field('description', 'Trail with image uploads');
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
       expect(response.body.data.images.length).toBe(2);
     });

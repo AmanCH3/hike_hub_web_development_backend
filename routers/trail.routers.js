@@ -44,7 +44,7 @@ const upload = require("../middlewares/fileUpload");
 
 // --- Admin Routes ---
 router.post("/create", protect, admin, upload.array('images', 10), trailController.createTrails);
-router.get("/:id", protect, trailController.getOneTrail); // Kept protect for consistency, can be removed if details are public
+router.get("/:id", protect, trailController.getOneTrail); 
 router.put("/:id", protect, admin, upload.array('images', 10), trailController.updateTrails);
 router.delete("/:id", protect, admin, trailController.deleteTrails);
 

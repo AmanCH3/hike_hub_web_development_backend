@@ -188,7 +188,7 @@ exports.getMyProfile = async (req, res) => {
     const user = await User.findById(req.user.id)
       .populate('completedTrails.trail')
       .populate('joinedTrails.trail')
-      .lean(); // .lean() makes the object mutable
+      .lean(); 
     
     if(!user){
       return res.status(404).json({
@@ -196,25 +196,16 @@ exports.getMyProfile = async (req, res) => {
         message : "User not found"
       })
     }
-
-    // ✅ --- NEW LOGIC TO CALCULATE GROUP STATS ---
-    // Count how many groups this user is the leader of.
     const groupsLedCount = await Group.countDocuments({ leader: user._id });
 
-    // Count how many groups this user is a confirmed participant in (but not the leader).
     const groupsJoinedCount = await Group.countDocuments({
       'participants.user': user._id,
       'participants.status': 'confirmed',
-      leader: { $ne: user._id } // Ensures we don't count groups they lead as "joined"
+      leader: { $ne: user._id } 
     });
 
-    // Add the calculated stats to the user object before sending.
-    // We use the existing fields from your User model's 'stats' object.
     user.stats.hikesLed = groupsLedCount;
     user.stats.hikesJoined = groupsJoinedCount;
-    // --- END OF NEW LOGIC ---
-
-    // This part fetches the full group details for the "Groups" tab
     const userGroups = await Group.find({
       $or: [
         { leader: user._id }, 

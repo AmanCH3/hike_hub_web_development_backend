@@ -9,7 +9,7 @@ router.post('/create',protect,upload.array('photo',10) , groupController.createG
 router.get('/' , groupController.getAll) ;
 router.get('/:id' , groupController.getGroupById) ;
 router.put('/:id' ,protect, admin, groupController.updateGroup) ;
-router.delete('/id',protect, admin , groupController.deletegroup ) ;
+router.delete('/:id',protect, admin , groupController.deletegroup ) ;
 router.post('/:id/request-join', protect, groupController.requestToJoinGroup);
 router.patch('/:groupId/requests/:requestId/approve', protect, admin, groupController.approveJoinRequest);
 router.patch('/:groupId/requests/:requestId/deny', protect, admin, groupController.denyJoinRequest);
